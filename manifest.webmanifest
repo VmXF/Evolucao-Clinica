@@ -1,0 +1,11 @@
+{
+  "name": "Evolução Clínica Offline",
+  "short_name": "Evolução Clínica",
+  "description": "Gerador local de evolução para enfermaria de Clínica Médica.",
+  "lang": "pt-BR",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#f4f8f7",
+  "theme_color": "#0b5f5d",
+  "icons": [{"src":"icon.svg","sizes":"any","type":"image/svg+xml","purpose":"any maskable"}]
+}

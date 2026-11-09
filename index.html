@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <meta name="theme-color" content="#0b5f5d">
+    <meta name="description" content="Gerador local de evolução clínica para enfermaria.">
+    <link rel="manifest" href="manifest.webmanifest">
+    <link rel="stylesheet" href="styles.css">
+    <title>Evolução Clínica Offline</title>
+  </head>
+  <body>
+    <header>
+      <div>
+        <p class="eyebrow">USO LOCAL · SEM SALVAMENTO AUTOMÁTICO</p>
+        <h1>Evolução Clínica</h1>
+        <p class="subtitle">Enfermaria de Clínica Médica</p>
+      </div>
+      <button id="installButton" class="secondary hidden" type="button">Instalar</button>
+    </header>
+
+    <main>
+      <aside class="privacy-note"><strong>Privacidade:</strong> os dados permanecem neste dispositivo e não são enviados pela aplicação. Feche ou limpe o formulário após copiar o texto.</aside>
+      <form id="noteForm" novalidate>
+        <section>
+          <h2>1. Identificação e contexto</h2>
+          <div class="grid two">
+            <label># Dia de internação<input name="diaInternacao" inputmode="numeric" placeholder="Ex.: 4"></label>
+            <label># Diagnósticos<textarea name="diagnosticos" rows="2" placeholder="Um ou mais diagnósticos"></textarea></label>
+            <label># Alergias<input name="alergias" placeholder="Descrever, se houver"></label>
+            <label># HPP<textarea name="hpp" rows="2" placeholder="História patológica pregressa"></textarea></label>
+          </div>
+          <label># Medicações de uso contínuo<textarea name="medicacoesUso" rows="2"></textarea></label>
+          <label>HDA<textarea name="hda" class="large" rows="6" placeholder="História e evolução desde a admissão"></textarea></label>
+        </section>
+
+        <section>
+          <h2>2. Últimas 24 horas</h2>
+          <div class="vitals" aria-label="Sinais vitais nas últimas 24 horas">
+            <span>Parâmetro</span><span>Máximo</span><span>Mínimo</span>
+            <label>PAS (mmHg)<input name="pasMax" inputmode="decimal" aria-label="PAS máxima"></label><input name="pasMin" inputmode="decimal" aria-label="PAS mínima">
+            <label>PAD (mmHg)<input name="padMax" inputmode="decimal" aria-label="PAD máxima"></label><input name="padMin" inputmode="decimal" aria-label="PAD mínima">
+            <label>FC (bpm)<input name="fcMax" inputmode="decimal" aria-label="FC máxima"></label><input name="fcMin" inputmode="decimal" aria-label="FC mínima">
+            <label>SpO₂ (%)<input name="spo2Max" inputmode="decimal" aria-label="SpO2 máxima"></label><input name="spo2Min" inputmode="decimal" aria-label="SpO2 mínima">
+            <label>Temperatura (°C)<input name="tempMax" inputmode="decimal" aria-label="Temperatura máxima"></label><input name="tempMin" inputmode="decimal" aria-label="Temperatura mínima">
+          </div>
+          <div class="grid three">
+            <label>Débito urinário<textarea name="debitoUrinario" rows="2" placeholder="Ex.: 1.200 mL/24 h"></textarea></label>
+            <label>Drenos<textarea name="drenos" rows="2" placeholder="Identificação e volume"></textarea></label>
+            <label>Outros débitos<textarea name="outrosDebitos" rows="2"></textarea></label>
+          </div>
+          <label>Intercorrências<textarea name="intercorrencias" rows="3"></textarea></label>
+          <label>Queixas / evolução subjetiva<textarea name="subjetivo" rows="3"></textarea></label>
+        </section>
+
+        <section>
+          <h2>3. Exame físico</h2>
+          <p class="hint">Marque somente os achados que devem constar no texto.</p>
+          <div id="examGroups" class="exam-groups"></div>
+          <label class="glasgow">Glasgow (3–15)<input name="glasgow" type="number" min="3" max="15" inputmode="numeric"></label>
+        </section>
+
+        <section>
+          <h2>4. Exames complementares</h2>
+          <div class="grid two">
+            <label>Exames laboratoriais<textarea name="laboratoriais" rows="5" placeholder="Resultados relevantes"></textarea></label>
+            <label>Exames de imagem<textarea name="imagem" rows="5" placeholder="Data e principais achados"></textarea></label>
+          </div>
+        </section>
+
+        <section>
+          <h2>5. Impressão e pendências</h2>
+          <label>Impressão<textarea name="impressao" class="large" rows="5"></textarea></label>
+          <div class="pending-header"><label>Pendências</label><button id="addPending" class="small secondary" type="button">+ Adicionar</button></div>
+          <div id="pendingItems" class="pending-items"></div>
+        </section>
+
+        <div class="actions">
+          <button class="primary" type="submit">Gerar evolução</button>
+          <button id="clearButton" class="secondary" type="button">Limpar formulário</button>
+        </div>
+      </form>
+
+      <section class="result-section" aria-live="polite">
+        <div class="result-header"><h2>Texto para prontuário</h2><button id="copyButton" class="secondary" type="button" disabled>Copiar</button></div>
+        <textarea id="output" rows="18" readonly placeholder="Preencha apenas o necessário e selecione “Gerar evolução”."></textarea>
+      </section>
+    </main>
+    <script src="app.js"></script>
+  </body>
+</html>
