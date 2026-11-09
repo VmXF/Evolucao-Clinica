@@ -25,24 +25,25 @@
         <section>
           <h2>1. Identificação e contexto</h2>
           <div class="grid two">
-            <label># Dia de internação<input name="diaInternacao" inputmode="numeric" placeholder="Ex.: 4"></label>
+            <label># Dia de internação<input name="diaInternacao" inputmode="numeric" maxlength="8" placeholder="DD/MM/AA" pattern="\d{2}/\d{2}/\d{2}"></label>
             <label># Diagnósticos<textarea name="diagnosticos" rows="2" placeholder="Um ou mais diagnósticos"></textarea></label>
             <label># Alergias<input name="alergias" placeholder="Descrever, se houver"></label>
             <label># HPP<textarea name="hpp" rows="2" placeholder="História patológica pregressa"></textarea></label>
           </div>
           <label># Medicações de uso contínuo<textarea name="medicacoesUso" rows="2"></textarea></label>
+          <label>Antibioticoterapia<textarea name="antibioticoterapia" rows="2" placeholder="Ex.: Vancomicina D0 em 13/10/26"></textarea></label>
           <label>HDA<textarea name="hda" class="large" rows="6" placeholder="História e evolução desde a admissão"></textarea></label>
         </section>
 
         <section>
           <h2>2. Últimas 24 horas</h2>
           <div class="vitals" aria-label="Sinais vitais nas últimas 24 horas">
-            <span>Parâmetro</span><span>Máximo</span><span>Mínimo</span>
-            <label>PAS (mmHg)<input name="pasMax" inputmode="decimal" aria-label="PAS máxima"></label><input name="pasMin" inputmode="decimal" aria-label="PAS mínima">
-            <label>PAD (mmHg)<input name="padMax" inputmode="decimal" aria-label="PAD máxima"></label><input name="padMin" inputmode="decimal" aria-label="PAD mínima">
-            <label>FC (bpm)<input name="fcMax" inputmode="decimal" aria-label="FC máxima"></label><input name="fcMin" inputmode="decimal" aria-label="FC mínima">
-            <label>SpO₂ (%)<input name="spo2Max" inputmode="decimal" aria-label="SpO2 máxima"></label><input name="spo2Min" inputmode="decimal" aria-label="SpO2 mínima">
-            <label>Temperatura (°C)<input name="tempMax" inputmode="decimal" aria-label="Temperatura máxima"></label><input name="tempMin" inputmode="decimal" aria-label="Temperatura mínima">
+            <span class="vital-head">Parâmetro</span><span class="vital-head">Máximo</span><span class="vital-head">Mínimo</span>
+            <label class="vital-name" for="pasMax">PAS (mmHg)</label><input id="pasMax" name="pasMax" inputmode="decimal" aria-label="PAS máxima"><input name="pasMin" inputmode="decimal" aria-label="PAS mínima">
+            <label class="vital-name" for="padMax">PAD (mmHg)</label><input id="padMax" name="padMax" inputmode="decimal" aria-label="PAD máxima"><input name="padMin" inputmode="decimal" aria-label="PAD mínima">
+            <label class="vital-name" for="fcMax">FC (bpm)</label><input id="fcMax" name="fcMax" inputmode="decimal" aria-label="FC máxima"><input name="fcMin" inputmode="decimal" aria-label="FC mínima">
+            <label class="vital-name" for="spo2Max">SpO₂ (%)</label><input id="spo2Max" name="spo2Max" inputmode="decimal" aria-label="SpO2 máxima"><input name="spo2Min" inputmode="decimal" aria-label="SpO2 mínima">
+            <label class="vital-name" for="tempMax">Temperatura (°C)</label><input id="tempMax" name="tempMax" inputmode="decimal" aria-label="Temperatura máxima"><input name="tempMin" inputmode="decimal" aria-label="Temperatura mínima">
           </div>
           <div class="grid three">
             <label>Débito urinário<textarea name="debitoUrinario" rows="2" placeholder="Ex.: 1.200 mL/24 h"></textarea></label>
