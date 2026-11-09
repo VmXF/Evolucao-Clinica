@@ -1,10 +1,10 @@
 "use strict";
 
 const examOptions = {
-  "Geral": ["BEG", "REG", "MEG", "Lúcido e orientado", "Corado", "Hipocorado", "Hidratado", "Desidratado"],
-  "Cardiovascular": ["RCR em 2T, BNF, sem sopros", "RCR em 2T, com sopro", "Perfusão periférica preservada", "TEC preservado"],
+  "Geral": ["BEG", "REG", "MEG", "Lúcido e orientado", "Corado", "Hipocorado", "Ictérico", "Anictérico", "Cianótico", "Acianótico", "Hidratado", "Desidratado"],
+  "Cardiovascular": ["RCR em 2T, BNF, sem sopros", "RCR em 2T, com sopro", "FA: RCI, BNF, sem sopros", "Perfusão periférica preservada", "TEC preservado", "TEC lentificado"],
   "Respiratório": ["MVUA, sem RA", "MV diminuído", "Estertores crepitantes", "Sibilos", "Roncos"],
-  "Abdome": ["Abd normal: plano, flácido, indolor, não palpo massas ou VMG", "Ascite +", "Globoso", "Distendido", "Dor à palpação", "RHA presentes", "RHA diminuídos", "RHA aumentados", "RHA ausentes"],
+  "Abdome": ["ABD: plano, flácido, indolor, não palpo massas ou VMG", "Ascite +", "Globoso", "Distendido", "Dor à palpação", "RHA presentes", "RHA diminuídos", "RHA aumentados", "RHA ausentes"],
   "Neurológico": ["Sem déficits focais", "Pupilas isocóricas e fotorreagentes", "Déficit motor", "Alteração do nível de consciência"],
   "Extremidades": ["Sem edema", "Edema periférico", "Panturrilhas livres", "Sinais de TVP"]
 };
@@ -24,7 +24,7 @@ function renderExamOptions() {
 function addPending(text = "") {
   const row = document.createElement("div");
   row.className = "pending-row";
-  row.innerHTML = `<input type="checkbox" aria-label="Incluir pendência"><input type="text" aria-label="Descrição da pendência" placeholder="Descrever pendência" value="${text.replace(/"/g, "&quot;")}"><button class="remove" type="button" aria-label="Remover pendência">×</button>`;
+  row.innerHTML = `<input type="text" aria-label="Descrição da pendência" placeholder="Descrever pendência" value="${text.replace(/"/g, "&quot;")}"><button class="remove" type="button" aria-label="Remover pendência">×</button>`;
   row.querySelector(".remove").addEventListener("click", () => row.remove());
   pendingItems.append(row);
 }
@@ -43,8 +43,18 @@ function section(title, lines) {
   return entries.length ? `${title}\n${entries.join("\n")}` : "";
 }
 
+function bulletList(label, name) {
+  const entries = value(name).split(/\r?\n/).map(item => item.trim()).filter(Boolean);
+  return entries.length ? `${label}\n${entries.map(item => `- ${item.replace(/^-\s*/, "")}`).join("\n")}` : "";
+}
+
+function formatAdmissionDate(event) {
+  const digits = event.target.value.replace(/\D/g, "").slice(0, 6);
+  event.target.value = digits.replace(/(\d{2})(\d)/, "$1/$2").replace(/(\d{2}\/\d{2})(\d)/, "$1/$2");
+}
+
 function generateNote() {
-  const header = [textLine("# Dia de internação", "diaInternacao"), textLine("# Diagnósticos", "diagnosticos"), textLine("# Alergias", "alergias"), textLine("# HPP", "hpp"), textLine("# Medicações de uso contínuo", "medicacoesUso"), value("hda") ? `HDA:\n${value("hda")}` : ""].filter(Boolean).join("\n");
+  const header = [textLine("# Dia de internação", "diaInternacao"), bulletList("# Diagnóstico(s)", "diagnosticos"), textLine("# Alergias", "alergias"), textLine("# HPP", "hpp"), textLine("# Medicações de uso contínuo", "medicacoesUso"), value("antibioticoterapia") ? `Antibioticoterapia:\n${value("antibioticoterapia")}` : "", value("hda") ? `HDA:\n${value("hda")}` : ""].filter(Boolean).join("\n");
   const vitals = [rangeLine("PAS", "mmHg", "pasMax", "pasMin"), rangeLine("PAD", "mmHg", "padMax", "padMin"), rangeLine("FC", "bpm", "fcMax", "fcMin"), rangeLine("SpO₂", "%", "spo2Max", "spo2Min"), rangeLine("Temperatura", "°C", "tempMax", "tempMin")];
   const last24 = section("ÚLTIMAS 24 HORAS", [...vitals, textLine("Débito urinário", "debitoUrinario"), textLine("Drenos", "drenos"), textLine("Outros débitos", "outrosDebitos"), textLine("Intercorrências", "intercorrencias"), textLine("Queixas / evolução subjetiva", "subjetivo")]);
   const grouped = {};
@@ -53,14 +63,15 @@ function generateNote() {
   const exam = section("EXAME FÍSICO", Object.entries(grouped).map(([group, findings]) => `${group}: ${findings.join("; ")}`));
   const complementary = section("EXAMES COMPLEMENTARES", [textLine("Laboratoriais", "laboratoriais"), textLine("Imagem", "imagem")]);
   const impression = section("IMPRESSÃO", [value("impressao")]);
-  const pending = [...pendingItems.querySelectorAll(".pending-row")].filter(row => row.querySelector('input[type="checkbox"]').checked).map(row => row.querySelector('input[type="text"]').value.trim()).filter(Boolean);
-  const pendingSection = section("PENDÊNCIAS", pending.map(item => `- ${item}`));
+  const pending = [...pendingItems.querySelectorAll(".pending-row")].map(row => row.querySelector('input[type="text"]').value.trim()).filter(Boolean);
+  const pendingSection = section("PENDÊNCIAS", pending.map(item => `- [ ] ${item}`));
   output.value = [header, last24, exam, complementary, impression, pendingSection].filter(Boolean).join("\n\n");
   document.querySelector("#copyButton").disabled = !output.value;
 }
 
 renderExamOptions();
 addPending();
+form.elements.diaInternacao.addEventListener("input", formatAdmissionDate);
 document.querySelector("#addPending").addEventListener("click", () => addPending());
 form.addEventListener("submit", event => { event.preventDefault(); generateNote(); output.scrollIntoView({ behavior: "smooth", block: "start" }); });
 document.querySelector("#clearButton").addEventListener("click", () => { form.reset(); pendingItems.replaceChildren(); addPending(); output.value = ""; document.querySelector("#copyButton").disabled = true; });
