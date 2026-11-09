@@ -33,9 +33,9 @@ function rangeLine(label, unit, maxName, minName) {
   const max = value(maxName), min = value(minName);
   if (!max && !min) return "";
   const parts = [];
-  if (max) parts.push(`máx ${max}`);
-  if (min) parts.push(`mín ${min}`);
-  return `${label}: ${parts.join("; ")}${unit ? ` ${unit}` : ""}`;
+  if (min) parts.push(min);
+  if (max) parts.push(max);
+  return `${label}: ${parts.join("-")}${unit || ""}`;
 }
 
 function section(title, lines) {
@@ -55,7 +55,7 @@ function formatAdmissionDate(event) {
 
 function generateNote() {
   const header = [textLine("# Dia de internação", "diaInternacao"), bulletList("# Diagnóstico(s)", "diagnosticos"), textLine("# Alergias", "alergias"), textLine("# HPP", "hpp"), textLine("# Medicações de uso contínuo", "medicacoesUso"), value("antibioticoterapia") ? `Antibioticoterapia:\n${value("antibioticoterapia")}` : "", value("hda") ? `HDA:\n${value("hda")}` : ""].filter(Boolean).join("\n");
-  const vitals = [rangeLine("PAS", "mmHg", "pasMax", "pasMin"), rangeLine("PAD", "mmHg", "padMax", "padMin"), rangeLine("FC", "bpm", "fcMax", "fcMin"), rangeLine("SpO₂", "%", "spo2Max", "spo2Min"), rangeLine("Temperatura", "°C", "tempMax", "tempMin")];
+  const vitals = [rangeLine("PAS", "mmHg", "pasMax", "pasMin"), rangeLine("PAD", "mmHg", "padMax", "padMin"), rangeLine("FC", "bpm", "fcMax", "fcMin"), rangeLine("SpO₂", "%", "spo2Max", "spo2Min"), rangeLine("Temp", "°C", "tempMax", "tempMin")];
   const last24 = section("ÚLTIMAS 24 HORAS", [...vitals, textLine("Débito urinário", "debitoUrinario"), textLine("Drenos", "drenos"), textLine("Outros débitos", "outrosDebitos"), textLine("Intercorrências", "intercorrencias"), textLine("Queixas / evolução subjetiva", "subjetivo")]);
   const grouped = {};
   document.querySelectorAll('input[name="exam"]:checked').forEach(input => (grouped[input.dataset.group] ||= []).push(input.value));
