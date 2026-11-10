@@ -3,11 +3,17 @@
 const examOptions = {
   "Geral": ["BEG", "REG", "MEG", "Lúcido e orientado", "Corado", "Hipocorado", "Ictérico", "Anictérico", "Cianótico", "Acianótico", "Hidratado", "Desidratado"],
   "Cardiovascular": ["RCR em 2T, BNF, sem sopros", "RCR em 2T, com sopro", "FA: RCI, BNF, sem sopros", "Perfusão periférica preservada", "TEC preservado", "TEC lentificado"],
-  "Respiratório": ["MVUA, sem RA", "MV diminuído", "Estertores crepitantes", "Sibilos", "Roncos"],
+  "Respiratório": ["Respirando em AA", "Respirando em CNO2", "Respirando em máscara facial", "MVUA, sem RA", "MV diminuído", "Estertores crepitantes", "Sibilos", "Roncos"],
   "Abdome": ["ABD: plano, flácido, indolor, não palpo massas ou VMG", "Ascite +", "Globoso", "Distendido", "Dor à palpação", "RHA presentes", "RHA diminuídos", "RHA aumentados", "RHA ausentes"],
   "Neurológico": ["Sem déficits focais", "Pupilas isocóricas e fotorreagentes", "Déficit motor", "Alteração do nível de consciência"],
-  "Extremidades": ["Sem edema", "Edema periférico", "Panturrilhas livres", "Sinais de TVP"]
+  "Extremidades": ["Sem edema", "Edema periférico", "Pulso periférico palpável", "Pulso periférico não palpável", "Panturrilhas livres", "Sinais de TVP"]
 };
+const labFields = [
+  ["hb", "Hb"], ["leuco", "Leuco"], ["leucoDif", "Diferencial", "wide"], ["plaq", "Plaq."], ["ca", "Ca total"], ["mg", "Mg"], ["na", "Na"],
+  ["k", "K"], ["pcr", "PCR"], ["cr", "Cr"], ["ur", "Ur"], ["inr", "INR"],
+  ["tgo", "TGO"], ["tgp", "TGP"], ["fa", "FA"], ["ggt", "GGT"], ["alb", "Albumina"], ["bi", "BI"], ["bt", "BT"],
+  ["lactato", "Lactato"], ["ph", "pH"], ["po2", "PO2"], ["pco2", "PCO2"], ["hco3", "HCO3"]
+];
 const form = document.querySelector("#noteForm");
 const output = document.querySelector("#output");
 const pendingItems = document.querySelector("#pendingItems");
@@ -19,6 +25,26 @@ function renderExamOptions() {
     <div class="exam-group"><h3>${group}</h3>${options.map((option, index) => `
       <label class="option"><input type="checkbox" name="exam" value="${option}" data-group="${group}" aria-label="${option}"><span>${option}</span></label>`).join("")}
     </div>`).join("");
+}
+
+function renderLabFields() {
+  document.querySelector("#labGrid").innerHTML = labFields.map(([key, label, cls]) =>
+    `<label class="${cls || ""}">${label}<input type="text" name="lab_${key}" autocomplete="off"${key === "leucoDif" ? ' placeholder="Ex.: 2% bast / 70% seg"' : ""}></label>`).join("");
+}
+
+function labsLine() {
+  const get = key => value(`lab_${key}`);
+  const parts = [];
+  labFields.forEach(([key, label]) => {
+    if (key === "leucoDif") return;
+    if (key === "leuco") {
+      if (get("leuco") && get("leucoDif")) parts.push(`Leuco ${get("leuco")} (${get("leucoDif")})`);
+      else if (get("leuco")) parts.push(`Leuco ${get("leuco")}`);
+      else if (get("leucoDif")) parts.push(`Leuco (${get("leucoDif")})`);
+    } else if (get(key)) parts.push(`${label} ${get(key)}`);
+  });
+  value("labOutros").split(/\r?\n/).map(item => item.trim()).filter(Boolean).forEach(item => parts.push(item));
+  return parts.length ? `Laboratoriais: ${parts.join(" / ")}` : "";
 }
 
 function addPending(text = "") {
@@ -61,7 +87,7 @@ function generateNote() {
   document.querySelectorAll('input[name="exam"]:checked').forEach(input => (grouped[input.dataset.group] ||= []).push(input.value));
   if (value("glasgow")) (grouped["Neurológico"] ||= []).push(`Glasgow ${value("glasgow")}`);
   const exam = section("EXAME FÍSICO", Object.entries(grouped).map(([group, findings]) => `${group}: ${findings.join("; ")}`));
-  const complementary = section("EXAMES COMPLEMENTARES", [textLine("Laboratoriais", "laboratoriais"), textLine("Imagem", "imagem")]);
+  const complementary = section("EXAMES COMPLEMENTARES", [labsLine(), textLine("Imagem", "imagem")]);
   const impression = section("IMPRESSÃO", [value("impressao")]);
   const pending = [...pendingItems.querySelectorAll(".pending-row")].map(row => row.querySelector('input[type="text"]').value.trim()).filter(Boolean);
   const pendingSection = section("PENDÊNCIAS", pending.map(item => `- [ ] ${item}`));
@@ -70,6 +96,7 @@ function generateNote() {
 }
 
 renderExamOptions();
+renderLabFields();
 addPending();
 form.elements.diaInternacao.addEventListener("input", formatAdmissionDate);
 document.querySelector("#addPending").addEventListener("click", () => addPending());
